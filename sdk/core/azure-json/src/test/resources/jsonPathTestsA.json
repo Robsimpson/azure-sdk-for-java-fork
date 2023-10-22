@@ -1,0 +1,35 @@
+{
+    "StringType": "String",
+    "NumberType": 123,
+    "BooleanType": true,
+    "NullType": null,
+    "ObjectType": {
+        "InnerValue1": "ONE",
+        "InnerValue2": "TWO",
+        "InnerValue3": "THREE"
+    },
+    "ArrayType": [
+        1,
+        2,
+        3,
+        4,
+        5,
+	6,
+	7
+    ],
+    "ObjectType2":{
+        "InnerValue1": "ONETWO",
+        "InnerValue2": {
+            "InnerValue3": "THREEFOUR"
+        },
+        "InnerValue4": "FIVESIX"
+    },
+    "ArrayType2": [
+        9,
+        9,
+        {
+            "InnerValue1": "Special"
+            
+        }
+    ]
+}

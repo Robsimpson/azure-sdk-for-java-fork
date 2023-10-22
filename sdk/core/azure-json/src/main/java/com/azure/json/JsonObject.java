@@ -272,11 +272,11 @@ public class JsonObject extends JsonElement {
 //    }
 
     /**
-     * Sets a property to a JsonObject by key and JsonElement value. 
+     * Sets a property to a JsonObject by key and JsonElement value.
      * <p>
-     * If {@code key} or {@code element} is null a {@link NullPointerException} will be thrown. 
-     * 
-     * @return The jsonObject with the added property. 
+     * If {@code key} or {@code element} is null a {@link NullPointerException} will be thrown.
+     *
+     * @return The jsonObject with the added property.
      */
     public JsonObject setProperty(String key, JsonElement element) {
         properties.put(key, element);
@@ -293,53 +293,16 @@ public class JsonObject extends JsonElement {
             return null;
         }
     }
+    /**
+     * @return Set of strings representing all keys currently used by JsonObject.
+     */
+
+    public Set<String> getKeys() {return this.properties.keySet();}
+
 
     @Override
     public boolean isObject() {
         return true;
-    }
-
-    @Override
-    public JsonArray asArray() {
-        JsonArray output = new JsonArray();
-        Set<String> keys = properties.keySet();
-        for (String key: keys) {
-            output.addElement(properties.get(key));
-        }
-        return output;
-    }
-
-    @Override
-    public JsonObject asObject() {
-        return this;
-    }
-
-    @Override
-    public JsonBoolean asBoolean() {
-        if (properties.size() >= 1) {
-            return properties.get(properties.keySet().iterator().next()).asBoolean(); //Should only get the first element.
-        } else {
-            return JsonBoolean.getInstance(true);
-        }
-    }
-
-    @Override
-    public JsonNumber asNumber() {
-        if (properties.size() >= 1) {
-            return properties.get(properties.keySet().iterator().next()).asNumber(); //Should only get the first element.
-        } else {
-            return new JsonNumber(0);
-        }
-    }
-
-    @Override
-    public JsonString asString() {
-        if (properties.size() >= 1) {
-            return properties.get(properties.keySet().iterator().next()).asString(); //Should only get the first element.
-        } else {
-            //todo hacky fix for now
-            return new JsonString("");
-        }
     }
 
     /**
@@ -401,7 +364,8 @@ public class JsonObject extends JsonElement {
                     throw new IOException("Invalid JsonToken.END_OBJECT token read prematurely from deserialised JSON object. Deserialisation aborted.");
                 // Case: the currently read token is a JsonToken.END_ARRAY token.
                 // JSON object is being deserialised, not a JSON array.
-              //  case END_ARRAY:
+               case END_ARRAY:
+                   break;
                  //   throw new IOException("Invalid JsonToken.END_ARRAY token read from deserialised JSON object. JSON object is being deserialised not a JSON array. This is not a valid JSON object. Deserialisation aborted.");
                 default:
                     throw new IOException(String.format("Invalid JsonToken %s read from deserialised JSON object. Deserialisation aborted.",token));
@@ -420,6 +384,48 @@ public class JsonObject extends JsonElement {
             toWriter(stringOutput);
             return stringOutput.toString();
         }
+    }
+
+
+    /**
+     * Retrieves the serialized String from toJson() and adds appropriate spacing for easier readability
+     * @return the String representation of the JsonObject
+     */
+    public String toJsonPretty() throws IOException {
+        int tabCount = 0;
+        String input = toJson();
+        for(int i = 0; i < input.length(); i++){
+            if(input.charAt(i) == '{' || input.charAt(i) == '['){
+                tabCount++;
+                String firstHalf = input.substring(0, i+1);
+                String lastHalf = input.substring(i+1);
+                String tabs = "\n";
+                for(int j = 0; j < tabCount; j++){
+                    tabs += "\t";
+                }
+                input = firstHalf + tabs + lastHalf;
+            } else if (input.charAt(i) == ',') {
+                String firstHalf = input.substring(0, i+1);
+                String lastHalf = input.substring(i+1);
+                String tabs = "\n";
+                for(int j = 0; j < tabCount; j++){
+                    tabs += "\t";
+                }
+                input = firstHalf + tabs + lastHalf;
+            } else if (input.charAt(i) == ']' || input.charAt(i) == '}'){
+                tabCount--;
+                String firstHalf = input.substring(0, i);
+                String lastHalf = input.substring(i);
+                String tabs = "\n";
+                for(int j = 0; j < tabCount; j++){
+                    tabs += "\t";
+                }
+                input = firstHalf + tabs + lastHalf;
+                i = i + tabs.length();
+            }
+        }
+        input = input.replace(":", ": ");
+        return input;
     }
 
     /**
@@ -465,16 +471,22 @@ public class JsonObject extends JsonElement {
      * @throws IOException if the underlying writer or stream throws an exception
      */
     public JsonWriter serialize(JsonWriter writer) throws IOException {
-        writer.writeStartObject();
-
-        //for each item in the linked hashmap
-        for (Map.Entry<String, JsonElement> entry : properties.entrySet()) {
-            //write the key
-            writer.writeFieldName(entry.getKey());
-            //write the value
-            entry.getValue().serialize(writer);
-        }
-        writer.writeEndObject();
+        writer.writeMap(properties, (entryValueWriter, entryValue) -> entryValue.serialize(entryValueWriter));
         return writer;
+    }
+
+    public String toJsonPath(String pathText, String args) throws IOException {
+        String result = toJsonPathElement(pathText, args).toString();
+        //System.out.println("FINAL RESULT AFTER SEARCH: " + result);
+        //System.out.println("--------------------------------------------------------------------------------");
+        return result.toString();
+    }
+
+    public JsonElement toJsonPathElement(String pathText, String args) throws IOException {
+        return JsonPath.Parse(this, pathText, args);
+    }
+
+    public JsonElement toJsonPointer(String input) throws IOException {
+        return JsonPointer.Parse(this, input);
     }
 }

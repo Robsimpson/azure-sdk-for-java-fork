@@ -1,0 +1,60 @@
+{
+    "library": [
+    {
+        "title": "Lord of the Onion Rings",
+        "year": 1987,
+        "genre": "fantasy",
+        "age rating": "adult",
+        "available": true
+    },
+    {
+        "title": "How to Science",
+        "year": 2022,
+        "genre": "fantasy",
+        "age rating": "child",
+        "available": true
+    },
+    {
+        "title": "Fifty Shades of Grey",
+        "year": 2012,
+        "genre": "fantasy",
+        "age rating": "adult",
+        "available": false
+    },
+    {
+        "title": "The bad man's book",
+        "year": 1925,
+        "genre": "history",
+        "age rating": "adult",
+        "available": false
+    },
+    {
+        "title": "Cooking with Kids",
+        "year": 1988,
+        "genre": "food",
+        "age rating": "all",
+        "available": true
+    },
+    {
+        "title": "Harry Potter and the Cupboard that didn't exist",
+        "year": 3000,
+        "genre": "fantasy",
+        "age rating": "child",
+        "available": false
+    },
+    {
+        "title": "My Loving Family",
+        "year": 2020,
+        "genre": "non-fiction",
+        "age rating": "all",
+        "available": true
+    },
+    {
+        "title": "Mystery Book",
+        "year": 0,
+        "genre": "unknown",
+        "age rating": "all",
+        "available": true
+    }
+    ]
+}

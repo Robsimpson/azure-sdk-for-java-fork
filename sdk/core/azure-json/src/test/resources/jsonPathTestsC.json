@@ -1,0 +1,28 @@
+
+    {
+    "empty object":{},
+    "empty array":[],
+    "empty word": null,
+    "nameWith.Dot": "DOT",
+    "backSlash\\": "BSlash",
+    ";": "Should not appear",
+    "": "Blank",
+    "[": "Bad Bracket Left",
+    "]": "Bad Bracket Right",
+    "0": "Zero",
+    "$.": "DollarDot",
+    "2:3:4": "Two Three Four",
+    "1:1:1:1": "One One One One",
+    "keyword": "Outside",
+    "filledObject": {
+        "keyword": "Inside1"
+    },
+    "filledobject": {
+        "innerArray": [
+            1,
+            3,
+            {"keyword":
+            "Inside2"}
+            ]
+        }
+    }

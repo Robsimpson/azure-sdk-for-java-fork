@@ -90,7 +90,11 @@ public class JsonArray extends JsonElement {
      */
     public JsonArray addElement(int index, JsonElement element) throws IllegalArgumentException, IndexOutOfBoundsException {
         nullCheck(element);
-        this.elements.add(index, element);
+        if(index >= elements.size()){
+            this.elements.add(element);
+        } else {
+            this.elements.add(index, element);
+        }
         return this;
     }
 
@@ -146,7 +150,7 @@ public class JsonArray extends JsonElement {
 
     /**
      * Size of the JsonElement array.
-     * 
+     *
      * @return The size of the array.
      */
     public int size() {
@@ -173,10 +177,14 @@ public class JsonArray extends JsonElement {
      * @throws IOException if the writer throws an exception
      */
     public Writer toWriter(Writer writer) throws IOException {
-        try (JsonWriter jsonWriter = JsonProviders.createWriter(writer)) {
-            serialize(jsonWriter);
+        if(writer != null){
+            try (JsonWriter jsonWriter = JsonProviders.createWriter(writer)) {
+                serialize(jsonWriter);
+            }
+            return writer;
+        } else {
+            throw new NullPointerException();
         }
-        return writer;
     }
 
     /**
@@ -186,10 +194,15 @@ public class JsonArray extends JsonElement {
      * @throws IOException if the output stream throws an exception
      */
     public OutputStream toStream(OutputStream stream) throws IOException {
-        try (JsonWriter jsonWriter = JsonProviders.createWriter(stream)) {
-            serialize(jsonWriter);
+        if(stream != null){
+            try (JsonWriter jsonWriter = JsonProviders.createWriter(stream)) {
+                serialize(jsonWriter);
+            }
+            return stream;
+        } else {
+            throw new NullPointerException();
         }
-        return stream;
+
     }
 
     /**
@@ -223,52 +236,6 @@ public class JsonArray extends JsonElement {
         return true;
     }
 
-    @Override
-    public JsonArray asArray() {
-        return this;
-    }
-
-    @Override
-    public JsonObject asObject() {
-        JsonObject output = new JsonObject();
-        for (int i = 0; i < elements.size(); i++) {
-            String keyword = "Value";
-            if (i > 0) {
-                keyword += i;
-            }
-            output.setProperty(keyword, elements.get(i));
-        }
-        return output;
-    }
-
-    @Override
-    public JsonBoolean asBoolean() {
-        if (elements.size() >= 1) {
-            return elements.get(0).asBoolean();
-        } else {
-            return JsonBoolean.getInstance(true);
-        }
-    }
-
-    @Override
-    public JsonNumber asNumber() {
-        if (elements.size() >= 1) {
-            return elements.get(0).asNumber();
-        } else {
-            return new JsonNumber(0);
-        }
-    }
-
-    @Override
-    public JsonString asString() {
-        if (elements.size() >= 1) {
-            return elements.get(0).asString();
-        } else {
-            //todo hacky fix for now
-            return new JsonString("");
-        }
-    }
-
     /**
      * @return String representation of the JsonArray. This functionality is
      * defined within the toJson method.
@@ -294,8 +261,12 @@ public class JsonArray extends JsonElement {
      * invalid JsonToken indicating a improperly formed JsonArray.
      */
     private void build(JsonReader reader) throws IOException {
-        while (reader.currentToken() != JsonToken.END_ARRAY) {
-            JsonToken token = reader.nextToken();
+        JsonToken token = reader.currentToken();
+        while (true) {
+            if (token == JsonToken.END_ARRAY){
+                break;
+            }
+            token = reader.nextToken();
 
             switch (token) {
                 // Case: the currently read token is a JsonToken.FIELD_NAME token.
@@ -335,5 +306,57 @@ public class JsonArray extends JsonElement {
                     throw new IOException(String.format("Default: Invalid JsonToken %s. Deserialisation aborted.", token));
             }
         }
+    }
+
+    public String toJsonPath(String pathText, String args) throws IOException {
+        String result = toJsonPathElement(pathText, args).toString();
+        //System.out.println("FINAL RESULT AFTER SEARCH: " + result);
+        //System.out.println("--------------------------------------------------------------------------------");
+        return result.toString();
+    }
+
+    public JsonElement toJsonPathElement(String pathText, String args) throws IOException {
+        return JsonPath.Parse(this, pathText, args);
+    }
+
+    public JsonElement toJsonPointer(String input) throws IOException {
+        return JsonPointer.Parse(this, input);
+    }
+
+    public String toJsonPretty() throws IOException {
+        int tabCount = 0;
+        String input = toJson();
+        for(int i = 0; i < input.length(); i++){
+            if(input.charAt(i) == '{' || input.charAt(i) == '['){
+                tabCount++;
+                String firstHalf = input.substring(0, i+1);
+                String lastHalf = input.substring(i+1);
+                String tabs = "\n";
+                for(int j = 0; j < tabCount; j++){
+                    tabs += "\t";
+                }
+                input = firstHalf + tabs + lastHalf;
+            } else if (input.charAt(i) == ',') {
+                String firstHalf = input.substring(0, i+1);
+                String lastHalf = input.substring(i+1);
+                String tabs = "\n";
+                for(int j = 0; j < tabCount; j++){
+                    tabs += "\t";
+                }
+                input = firstHalf + tabs + lastHalf;
+            } else if (input.charAt(i) == ']' || input.charAt(i) == '}'){
+                tabCount--;
+                String firstHalf = input.substring(0, i);
+                String lastHalf = input.substring(i);
+                String tabs = "\n";
+                for(int j = 0; j < tabCount; j++){
+                    tabs += "\t";
+                }
+                input = firstHalf + tabs + lastHalf;
+                i = i + tabs.length();
+            }
+        }
+        input = input.replace(":", ": ");
+        return input;
     }
 }

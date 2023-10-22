@@ -129,11 +129,11 @@ public class JsonOutputTests {
 //    public void complexJSONChaining() throws IOException {
 //        String expected = "{\"Mary\":\"Jones\",\"John\":\"Williams\"}";
 //        JsonObject jsonObj = new JsonObject();
-//        jsonObj.addProperty("James", new JsonString("Anderson"))
-//            .addProperty("Michael", new JsonString("Campbell"))
-//            .addProperty("Mary", new JsonString("Jones"))
+//        jsonObj.setProperty("James", new JsonString("Anderson"))
+//            .setProperty("Michael", new JsonString("Campbell"))
+//            .setProperty("Mary", new JsonString("Jones"))
 //            .removeProperty("Michael")
-//            .addProperty("John", new JsonString("Williams"))
+//            .setProperty("John", new JsonString("Williams"))
 //            .removeProperty("James");
 //        assertEquals(expected, jsonObj.toJson());
 //    }
@@ -172,6 +172,48 @@ public class JsonOutputTests {
                 new JsonString(country));
         }
         assertEquals(expected, countryArray.toJson());
+    }
+
+    @Test
+    public void toJsonPretty() throws IOException {
+        String expected = "{\n" +
+            "\t\"Value1\": [\n" +
+            "\t\t{\n" +
+            "\t\t\t\"Value2\": 2\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"Value3\": 3\n" +
+            "\t\t}\n" +
+            "\t]\n" +
+            "}";
+        String actual = new JsonObject()
+            .setProperty("Value1", new JsonArray()
+                .addElement(new JsonObject().setProperty("Value2", new JsonNumber(2)))
+                .addElement(new JsonObject().setProperty("Value3", new JsonNumber(3)))
+            )
+            .toJsonPretty();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void toJsonPrettyArray() throws IOException {
+        String expected = "{\n" +
+            "\t\"intList\": [\n" +
+            "\t\t3,\n" +
+            "\t\t1,\n" +
+            "\t\t4,\n" +
+            "\t\t1,\n" +
+            "\t\t5,\n" +
+            "\t\t9\n" +
+            "\t]\n" +
+            "}";
+        int[] values = new int[]{3, 1, 4, 1, 5, 9};
+        JsonArray intList = new JsonArray();
+        for (int a: values){
+            intList.addElement(new JsonNumber(a));
+        }
+        String actual = new JsonObject().setProperty("intList", intList).toJsonPretty();
+        assertEquals(expected, actual);
     }
 
 //    @Test
