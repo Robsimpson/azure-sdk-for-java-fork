@@ -100,7 +100,15 @@
     </developer>
   </developers>
 
+  <repositories>
+    <repository>
+      <id>local-repo</id>
+      <url>file://${project.basedir}/../local-repo</url>
+    </repository>
+  </repositories>
+
   <dependencies>
+
     <dependency>
       <groupId>com.azure</groupId>
       <artifactId>azure-json</artifactId>
@@ -135,6 +143,13 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.36</version> <!-- {x-version-update;org.slf4j:slf4j-api;external_dependency} -->
+    </dependency>
+
+    <!-- Dependency to test migration of azure-core to io.clientcore -->
+    <dependency>
+      <groupId>io.clientcore</groupId>
+      <artifactId>core</artifactId>
+      <version>1.0.0-beta.1</version>
     </dependency>
 
     <!-- Added this dependency to include necessary annotations used by reactor core.
