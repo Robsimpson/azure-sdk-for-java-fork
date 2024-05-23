@@ -33,6 +33,7 @@ import com.azure.cosmos.implementation.batch.PartitionScopeThresholds;
 import com.azure.cosmos.implementation.clienttelemetry.ClientTelemetry;
 import com.azure.cosmos.implementation.clienttelemetry.CosmosMeterOptions;
 import com.azure.cosmos.implementation.clienttelemetry.MetricCategory;
+import com.azure.cosmos.implementation.clienttelemetry.ShowQueryOptions;
 import com.azure.cosmos.implementation.clienttelemetry.TagName;
 import com.azure.cosmos.implementation.directconnectivity.ContainerDirectConnectionMetadata;
 import com.azure.cosmos.implementation.directconnectivity.Uri;
@@ -149,6 +150,10 @@ public class ImplementationBridgeHelpers {
             String getEndpoint(CosmosClientBuilder builder);
 
             CosmosItemSerializer getDefaultCustomSerializer(CosmosClientBuilder builder);
+
+            void setRegionScopedSessionCapturingEnabled(CosmosClientBuilder builder, boolean isRegionScopedSessionCapturingEnabled);
+
+            boolean getRegionScopedSessionCapturingEnabled(CosmosClientBuilder builder);
         }
     }
 
@@ -184,6 +189,7 @@ public class ImplementationBridgeHelpers {
         public interface PartitionKeyAccessor {
             PartitionKey toPartitionKey(PartitionKeyInternal partitionKeyInternal);
             PartitionKey toPartitionKey(List<Object> values, boolean strict);
+            PartitionKeyInternal getPartitionKeyInternal(PartitionKey partitionKey);
         }
     }
 
@@ -281,6 +287,12 @@ public class ImplementationBridgeHelpers {
             Integer getMaxItemCount(CosmosQueryRequestOptions options);
 
             String getRequestContinuation(CosmosQueryRequestOptions options);
+
+            Integer getMaxItemCountForVectorSearch(CosmosQueryRequestOptions options);
+
+            void setPartitionKeyDefinition(CosmosQueryRequestOptions options, PartitionKeyDefinition partitionKeyDefinition);
+
+            PartitionKeyDefinition getPartitionKeyDefinition(CosmosQueryRequestOptions options);
         }
     }
 
@@ -830,7 +842,8 @@ public class ImplementationBridgeHelpers {
                 String trackingId,
                 String connectionMode,
                 String userAgent,
-                Integer sequenceNumber);
+                Integer sequenceNumber,
+                String queryStatement);
 
             CosmosDiagnosticsSystemUsageSnapshot createSystemUsageSnapshot(
                 String cpu,
@@ -883,6 +896,9 @@ public class ImplementationBridgeHelpers {
             Integer getSequenceNumber(CosmosDiagnosticsContext ctx);
 
             boolean isEmptyCompletion(CosmosDiagnosticsContext ctx);
+
+            String getQueryStatement(CosmosDiagnosticsContext ctx);
+
         }
     }
 
@@ -1488,6 +1504,7 @@ public class ImplementationBridgeHelpers {
             void setUseLegacyTracing(CosmosClientTelemetryConfig config, boolean useLegacyTracing);
             void setTracer(CosmosClientTelemetryConfig config, Tracer tracer);
             double getSamplingRate(CosmosClientTelemetryConfig config);
+            ShowQueryOptions showQueryOptions(CosmosClientTelemetryConfig config);
             double[] getDefaultPercentiles(CosmosClientTelemetryConfig config);
             boolean shouldPublishHistograms(CosmosClientTelemetryConfig config);
             boolean shouldApplyDiagnosticThresholdsForTransportLevelMeters(CosmosClientTelemetryConfig config);
