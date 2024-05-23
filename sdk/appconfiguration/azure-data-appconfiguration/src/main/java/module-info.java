@@ -4,6 +4,7 @@
 module com.azure.data.appconfiguration {
     requires transitive com.azure.core;
     requires com.azure.json;
+    requires io.clientcore.core;
 
     opens com.azure.data.appconfiguration.implementation to com.azure.core;
     opens com.azure.data.appconfiguration.implementation.models to com.azure.core;

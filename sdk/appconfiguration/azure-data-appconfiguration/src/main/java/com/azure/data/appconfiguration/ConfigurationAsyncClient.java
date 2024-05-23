@@ -3,23 +3,44 @@
 
 package com.azure.data.appconfiguration;
 
-import com.azure.core.annotation.ReturnType;
-import com.azure.core.annotation.ServiceClient;
-import com.azure.core.annotation.ServiceMethod;
+//import com.azure.core.annotation.ReturnType;
+import io.clientcore.core.annotation.ReturnType;
+
+import com.azure.core.annotation.ServiceClient; // uses isAsync=True as a test, if async is being removed then will need considering
+//import io.clientcore.core.annotation.ServiceClient;
+
+//import com.azure.core.annotation.ServiceMethod;
+import io.clientcore.core.annotation.ServiceMethod;
+
 import com.azure.core.exception.HttpResponseException;
+//import io.clientcore.core.http.exception.HttpResponseException; changes in responses need to be wrapped/adapted perhaps, especially async
+
+// no io.clientcore equivalents to these two
 import com.azure.core.exception.ResourceModifiedException;
 import com.azure.core.exception.ResourceNotFoundException;
+
+
 import com.azure.core.http.HttpResponse;
+//import io.clientcore.core.http.models.HttpResponse;
+
+// not in io.clientcore
 import com.azure.core.http.MatchConditions;
 import com.azure.core.http.rest.PagedFlux;
 import com.azure.core.http.rest.PagedResponse;
 import com.azure.core.http.rest.Response;
 import com.azure.core.http.rest.ResponseBase;
 import com.azure.core.http.rest.SimpleResponse;
+
 import com.azure.core.util.Context;
+//import io.clientcore.core.util.Context;
+
 import com.azure.core.util.logging.ClientLogger;
+//import io.clientcore.core.util.ClientLogger;
+
+// not in io.clientcore
 import com.azure.core.util.polling.PollOperationDetails;
 import com.azure.core.util.polling.PollerFlux;
+
 import com.azure.data.appconfiguration.implementation.AzureAppConfigurationImpl;
 import com.azure.data.appconfiguration.implementation.ConfigurationSettingDeserializationHelper;
 import com.azure.data.appconfiguration.implementation.CreateSnapshotUtilClient;

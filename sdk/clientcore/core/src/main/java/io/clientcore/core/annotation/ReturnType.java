@@ -18,8 +18,14 @@ public enum ReturnType {
      */
     COLLECTION,
 
+
     /**
      * Server Sent Event operation return type.
      */
-    SERVER_SENT_EVENT
+    SERVER_SENT_EVENT,
+
+    /**
+     * Long Running Operation
+     */
+    LONG_RUNNING_OPERATION,
 }
